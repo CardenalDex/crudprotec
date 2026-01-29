@@ -1,5 +1,52 @@
 basePath: /api/v1
 definitions:
+  github_com_CardenalDex_crudprotec_internal_entitys.Business:
+    properties:
+      commission:
+        description: Represented in basis points (e.g., 550 = 5.5%)
+        format: int64
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_CardenalDex_crudprotec_internal_entitys.Log:
+    properties:
+      action:
+        description: '"UPDATE_TRANSACTION"'
+        type: string
+      actor:
+        description: made by
+        type: string
+      id:
+        type: string
+      prevResourceID:
+        description: Previous state
+        type: string
+      resourceID:
+        description: ID of the affected resource
+        type: string
+      timestamp:
+        type: string
+    type: object
+  github_com_CardenalDex_crudprotec_internal_entitys.Merchant:
+    properties:
+      businessID:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   github_com_CardenalDex_crudprotec_internal_entitys.Transaction:
     properties:
       amount:
@@ -23,6 +70,21 @@ definitions:
       timestamp:
         type: string
     type: object
+  internal_adapter_handler.createBusinessRequest:
+    properties:
+      commission_percentage:
+        description: e.g., 5.5 for 5.5%
+        type: number
+    required:
+    - commission_percentage
+    type: object
+  internal_adapter_handler.createMerchantRequest:
+    properties:
+      business_id:
+        type: string
+    required:
+    - business_id
+    type: object
   internal_adapter_handler.createTransactionRequest:
     properties:
       amount:
@@ -34,6 +96,13 @@ definitions:
     - amount
     - merchant_id
     type: object
+  internal_adapter_handler.updateCommissionRequest:
+    properties:
+      new_commission_percentage:
+        type: number
+    required:
+    - new_commission_percentage
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -41,7 +110,388 @@ info:
   title: Payment System API
   version: "1.0"
 paths:
-  /transactions:
+  /admin/businesses/{id}:
+    get:
+      description: Retrieve details of a specific business by ID
+      parameters:
+      - description: Business UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Business'
+        "400":
+          description: Invalid UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Business not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get Business Details
+      tags:
+      - admin
+  /admin/businesses/{id}/commission:
+    patch:
+      consumes:
+      - application/json
+      description: Update the commission rate for an existing business
+      parameters:
+      - description: Business UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New Commission Rate
+        in: body
+        name: commission
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapter_handler.updateCommissionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Business'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update Business Commission
+      tags:
+      - admin
+  /admin/businesses/delete/{id}:
+    delete:
+      description: Soft delete a business (Logical Delete)
+      parameters:
+      - description: Business UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a Business
+      tags:
+      - admin
+  /admin/businesses/new:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new business entity with a specific commission rate
+      parameters:
+      - description: Business Registration
+        in: body
+        name: business
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapter_handler.createBusinessRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Business'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new Business
+      tags:
+      - admin
+  /audit:
+    get:
+      description: Retrieve all system audit logs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Log'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get All Logs
+      tags:
+      - audit
+  /audit/{resource_id}:
+    get:
+      description: Retrieve audit logs for a specific resource (e.g., a Business ID
+        or Transaction ID)
+      parameters:
+      - description: Resource ID
+        in: path
+        name: resource_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Log'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get Audit Logs
+      tags:
+      - audit
+  /merchants/{id}:
+    get:
+      description: Retrieve details of a specific merchant by ID
+      parameters:
+      - description: Merchant UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Merchant'
+        "400":
+          description: Invalid UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Merchant not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get Merchant Details
+      tags:
+      - merchants
+  /merchants/bybusiness/{businessID}:
+    get:
+      description: Retrieve all merchants belonging to a specific Business
+      parameters:
+      - description: Business UUID
+        in: path
+        name: businessID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Merchant'
+            type: array
+        "400":
+          description: Invalid UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List Merchants by Business
+      tags:
+      - merchants
+  /merchants/delete/{id}:
+    delete:
+      description: Logic delete of a merchant
+      parameters:
+      - description: Merchant UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remove a Merchant
+      tags:
+      - merchants
+  /merchants/new:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new merchant linked to a specific business
+      parameters:
+      - description: Merchant Registration
+        in: body
+        name: merchant
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapter_handler.createMerchantRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Merchant'
+        "400":
+          description: Invalid input or Business UUID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new Merchant
+      tags:
+      - merchants
+  /transactions/{id}:
+    get:
+      description: Retrieve a specific transaction details by its UUID
+      parameters:
+      - description: Transaction UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Transaction'
+        "400":
+          description: Invalid UUID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Transaction not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a transaction by ID
+      tags:
+      - transactions
+  /transactions/bymerchant/{merchantID}:
+    get:
+      description: Retrieve all transactions belonging to a specific merchant
+      parameters:
+      - description: Merchant UUID
+        in: path
+        name: merchantID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Transaction'
+            type: array
+        "400":
+          description: Invalid UUID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List transactions by Merchant
+      tags:
+      - transactions
+  /transactions/new:
     post:
       consumes:
       - application/json
@@ -74,6 +524,27 @@ paths:
               type: string
             type: object
       summary: Create a new transaction
+      tags:
+      - transactions
+  /transactions/transactions:
+    get:
+      description: Retrieve all transactions in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Transaction'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all transactions
       tags:
       - transactions
 swagger: "2.0"

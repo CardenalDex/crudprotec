@@ -7,7 +7,6 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	// Import your generated docs (you need to run `swag init` first)
 	_ "github.com/CardenalDex/crudprotec/docs"
 
 	config "github.com/CardenalDex/crudprotec/cmd"
@@ -17,8 +16,8 @@ import (
 )
 
 // @title Payment System API
-// @version 1.0
-// @description Clean Architecture Example with Go, Docker.
+// @version 0.001
+// @description Prueba tecnica Go,Docker,Gin,Swagger,CleanArquitecture, and so much more
 // @host localhost:8080
 // @BasePath /api/v1
 func main() {

@@ -59,12 +59,12 @@ func (r *sqliteRepo) GetBusinessByID(ctx context.Context, id uuid.UUID) (*entity
 
 func (r *sqliteRepo) UpdateBusiness(ctx context.Context, b *entity.Business) error {
 	model := toBusinessModel(b)
-	// Updates the record matching the ID with all fields in the model
+
 	return r.db.WithContext(ctx).Save(model).Error
 }
 
 func (r *sqliteRepo) DeleteBusiness(ctx context.Context, id uuid.UUID) error {
-	// GORM performs a soft delete because BusinessModel has gorm.DeletedAt
+
 	return r.db.WithContext(ctx).Delete(&BusinessModel{}, "id = ?", id).Error
 }
 
@@ -153,7 +153,6 @@ func (r *sqliteRepo) GetLogByID(ctx context.Context, id string) (entity.Log, err
 	if err := r.db.WithContext(ctx).First(&model, "id = ?", id).Error; err != nil {
 		return entity.Log{}, err
 	}
-	// Assuming toEntity is defined in models.go
 	return *model.toEntity(), nil
 }
 

@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	_ "github.com/CardenalDex/crudprotec/internal/entitys" // Swagger alias
+	_ "github.com/CardenalDex/crudprotec/internal/entitys" // neeeded for swagger
 	"github.com/CardenalDex/crudprotec/internal/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -16,8 +16,6 @@ type AdminHandler struct {
 func NewAdminHandler(s usecase.AdminUseCase) *AdminHandler {
 	return &AdminHandler{service: s}
 }
-
-// --- DTOs ---
 
 type createBusinessRequest struct {
 	Commission float64 `json:"commission_percentage" binding:"required,gt=0"` // e.g., 5.5 for 5.5%

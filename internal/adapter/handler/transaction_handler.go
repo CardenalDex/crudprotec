@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	_ "github.com/CardenalDex/crudprotec/internal/entitys" // Alias for swagger
+	_ "github.com/CardenalDex/crudprotec/internal/entitys" // neded for swagger
 	"github.com/CardenalDex/crudprotec/internal/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -20,7 +20,7 @@ func NewTransactionHandler(s usecase.TransactionUseCase) *TransactionHandler {
 // Request DTO
 type createTransactionRequest struct {
 	MerchantID string  `json:"merchant_id" binding:"required"`
-	Amount     float64 `json:"amount" binding:"required,gt=0"` // Input as float for user friendliness
+	Amount     float64 `json:"amount" binding:"required,gt=0"` // Input as float for user friendliness (converted after)
 }
 
 // @Summary Create a new transaction
@@ -49,7 +49,6 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	// CONVERSION LAYER: Convert User Float ($200.00) -> System Int64 Cents (20000)
 	amountCents := int64(req.Amount * 100)
 
-	// Call Business Logic
 	tx, err := h.service.ProcessTransaction(c.Request.Context(), merchantUUID, amountCents)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -78,7 +77,6 @@ func (h *TransactionHandler) GetTransaction(c *gin.Context) {
 
 	tx, err := h.service.GetTransaction(c.Request.Context(), txID)
 	if err != nil {
-		// Differentiating between "not found" and internal errors usually requires simpler logic for now
 		c.JSON(http.StatusNotFound, gin.H{"error": "Transaction not found"})
 		return
 	}

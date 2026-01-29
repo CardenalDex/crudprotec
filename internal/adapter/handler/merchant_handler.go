@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	_ "github.com/CardenalDex/crudprotec/internal/entitys" // Swagger alias
+	_ "github.com/CardenalDex/crudprotec/internal/entitys" // needed for swager
 	"github.com/CardenalDex/crudprotec/internal/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -16,8 +16,6 @@ type MerchantHandler struct {
 func NewMerchantHandler(s usecase.MerchantUseCase) *MerchantHandler {
 	return &MerchantHandler{service: s}
 }
-
-// --- DTOs ---
 
 type createMerchantRequest struct {
 	BusinessID string `json:"business_id" binding:"required"`
@@ -44,7 +42,7 @@ func (h *MerchantHandler) RegisterMerchant(c *gin.Context) {
 
 	bizUUID, err := uuid.Parse(req.BusinessID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Business UUID format"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Business UUID"})
 		return
 	}
 

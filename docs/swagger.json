@@ -9,7 +9,537 @@
     "host": "localhost:8080",
     "basePath": "/api/v1",
     "paths": {
-        "/transactions": {
+        "/admin/businesses/delete/{id}": {
+            "delete": {
+                "description": "Soft delete a business (Logical Delete)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Delete a Business",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Business UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/businesses/new": {
+            "post": {
+                "description": "Creates a new business entity with a specific commission rate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Register a new Business",
+                "parameters": [
+                    {
+                        "description": "Business Registration",
+                        "name": "business",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapter_handler.createBusinessRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Business"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/businesses/{id}": {
+            "get": {
+                "description": "Retrieve details of a specific business by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get Business Details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Business UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Business"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Business not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/businesses/{id}/commission": {
+            "patch": {
+                "description": "Update the commission rate for an existing business",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Update Business Commission",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Business UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Commission Rate",
+                        "name": "commission",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapter_handler.updateCommissionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Business"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/audit": {
+            "get": {
+                "description": "Retrieve all system audit logs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "audit"
+                ],
+                "summary": "Get All Logs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Log"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/audit/{resource_id}": {
+            "get": {
+                "description": "Retrieve audit logs for a specific resource (e.g., a Business ID or Transaction ID)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "audit"
+                ],
+                "summary": "Get Audit Logs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Resource ID",
+                        "name": "resource_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Log"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/merchants/bybusiness/{businessID}": {
+            "get": {
+                "description": "Retrieve all merchants belonging to a specific Business",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "merchants"
+                ],
+                "summary": "List Merchants by Business",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Business UUID",
+                        "name": "businessID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Merchant"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/merchants/delete/{id}": {
+            "delete": {
+                "description": "Logic delete of a merchant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "merchants"
+                ],
+                "summary": "Remove a Merchant",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Merchant UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success message",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/merchants/new": {
+            "post": {
+                "description": "Creates a new merchant linked to a specific business",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "merchants"
+                ],
+                "summary": "Register a new Merchant",
+                "parameters": [
+                    {
+                        "description": "Merchant Registration",
+                        "name": "merchant",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapter_handler.createMerchantRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Merchant"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or Business UUID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/merchants/{id}": {
+            "get": {
+                "description": "Retrieve details of a specific merchant by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "merchants"
+                ],
+                "summary": "Get Merchant Details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Merchant UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Merchant"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Merchant not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/bymerchant/{merchantID}": {
+            "get": {
+                "description": "Retrieve all transactions belonging to a specific merchant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "List transactions by Merchant",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Merchant UUID",
+                        "name": "merchantID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Transaction"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID format",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/new": {
             "post": {
                 "description": "Calculates commission and fees, saves to DB, and returns the created transaction",
                 "consumes": [
@@ -60,9 +590,157 @@
                     }
                 }
             }
+        },
+        "/transactions/transactions": {
+            "get": {
+                "description": "Retrieve all transactions in the system",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "List all transactions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Transaction"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/{id}": {
+            "get": {
+                "description": "Retrieve a specific transaction details by its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Get a transaction by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Transaction UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID format",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Transaction not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "github_com_CardenalDex_crudprotec_internal_entitys.Business": {
+            "type": "object",
+            "properties": {
+                "commission": {
+                    "description": "Represented in basis points (e.g., 550 = 5.5%)",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_CardenalDex_crudprotec_internal_entitys.Log": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "description": "\"UPDATE_TRANSACTION\"",
+                    "type": "string"
+                },
+                "actor": {
+                    "description": "made by",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "prevResourceID": {
+                    "description": "Previous state",
+                    "type": "string"
+                },
+                "resourceID": {
+                    "description": "ID of the affected resource",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_CardenalDex_crudprotec_internal_entitys.Merchant": {
+            "type": "object",
+            "properties": {
+                "businessID": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_CardenalDex_crudprotec_internal_entitys.Transaction": {
             "type": "object",
             "properties": {
@@ -95,6 +773,29 @@
                 }
             }
         },
+        "internal_adapter_handler.createBusinessRequest": {
+            "type": "object",
+            "required": [
+                "commission_percentage"
+            ],
+            "properties": {
+                "commission_percentage": {
+                    "description": "e.g., 5.5 for 5.5%",
+                    "type": "number"
+                }
+            }
+        },
+        "internal_adapter_handler.createMerchantRequest": {
+            "type": "object",
+            "required": [
+                "business_id"
+            ],
+            "properties": {
+                "business_id": {
+                    "type": "string"
+                }
+            }
+        },
         "internal_adapter_handler.createTransactionRequest": {
             "type": "object",
             "required": [
@@ -108,6 +809,17 @@
                 },
                 "merchant_id": {
                     "type": "string"
+                }
+            }
+        },
+        "internal_adapter_handler.updateCommissionRequest": {
+            "type": "object",
+            "required": [
+                "new_commission_percentage"
+            ],
+            "properties": {
+                "new_commission_percentage": {
+                    "type": "number"
                 }
             }
         }

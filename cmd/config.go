@@ -12,7 +12,6 @@ func LoadConfig() (*Config, error) {
 	cfg := &Config{}
 	err := cleanenv.ReadConfig(".env", cfg)
 	if err != nil {
-		// If .env missing, try reading purely from environment vars
 		err = cleanenv.ReadEnv(cfg)
 	}
 	return cfg, err

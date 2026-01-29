@@ -1,8 +1,11 @@
 # Stage 1: Build
-FROM golang:1.24-alpine AS builder
+FROM golang:1.25.5-alpine AS builder
 
-# Install build dependencies and swag
-RUN apk add --no-cache git
+# Install build dependencies: 
+# build-base contains gcc, make, and libc-dev required for CGO
+RUN apk add --no-cache git build-base
+
+# Install swag CLI
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 WORKDIR /app
@@ -15,28 +18,26 @@ RUN go mod download
 COPY . .
 
 # Generate Swagger documentation
-# Note: Ensure the path to main.go is correct based on your project structure
 RUN swag init -g cmd/app/main.go -d ./ --parseDependency --output docs
 
-# Build the application
-# CGO_ENABLED=0 is preferred for alpine to ensure a static binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/server ./cmd/app/main.go
+# Build the application with CGO enabled
+# We use -tags musl if needed, but standard build usually works on alpine with build-base
+RUN CGO_ENABLED=1 GOOS=linux go build -o /app/server ./cmd/app/main.go
 
 # Stage 2: Final Image
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates tzdata
+# We need to install the shared libraries that the binary was linked against (libc)
+RUN apk --no-cache add ca-certificates tzdata libc6-compat
 
 WORKDIR /app
 
 # Create the data directory for the internal SQLite database
 RUN mkdir -p /app/data
 
-# Copy the binary and the generated docs from the builder
+# Copy the binary and docs from builder
 COPY --from=builder /app/server .
 COPY --from=builder /app/docs ./docs
 
-# Expose the default port
 EXPOSE 8080
 
-# Run the application
 CMD ["./server"]

@@ -1,0 +1,79 @@
+basePath: /api/v1
+definitions:
+  github_com_CardenalDex_crudprotec_internal_entitys.Transaction:
+    properties:
+      amount:
+        description: Value in cents (200.00 -> 20000)
+        format: int64
+        type: integer
+      commission:
+        description: in cents
+        format: int64
+        type: integer
+      deletedAt:
+        type: string
+      fee:
+        description: in centi% 5.5=550
+        format: int64
+        type: integer
+      id:
+        type: string
+      merchantID:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  internal_adapter_handler.createTransactionRequest:
+    properties:
+      amount:
+        description: Input as float for user friendliness
+        type: number
+      merchant_id:
+        type: string
+    required:
+    - amount
+    - merchant_id
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Clean Architecture Example with Go, Docker.
+  title: Payment System API
+  version: "1.0"
+paths:
+  /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Calculates commission and fees, saves to DB, and returns the created
+        transaction
+      parameters:
+      - description: Transaction Request
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapter_handler.createTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_CardenalDex_crudprotec_internal_entitys.Transaction'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new transaction
+      tags:
+      - transactions
+swagger: "2.0"

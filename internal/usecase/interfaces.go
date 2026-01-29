@@ -10,29 +10,29 @@ import (
 type BusinessRepository interface {
 	CreateBusiness(ctx context.Context, b *entity.Business) error
 	GetBusinessByID(ctx context.Context, id uuid.UUID) (*entity.Business, error)
-	//UpdateBusiness(ctx context.Context, b *entity.Business) error
+	UpdateBusiness(ctx context.Context, b *entity.Business) error
 	DeleteBusiness(ctx context.Context, id uuid.UUID) error
 }
 
 type MerchantRepository interface {
-	//CreateMerchant(ctx context.Context, m *entity.Merchant) error
+	CreateMerchant(ctx context.Context, m *entity.Merchant) error
 	GetMerchantByID(ctx context.Context, id uuid.UUID) (*entity.Merchant, error)
-	//GetMerchantByBusinessID(ctx context.Context, businessID uuid.UUID) ([]entity.Merchant, error)
-	//DeleteMerchant(ctx context.Context, id uuid.UUID) error
+	GetMerchantByBusinessID(ctx context.Context, businessID uuid.UUID) ([]entity.Merchant, error)
+	DeleteMerchant(ctx context.Context, id uuid.UUID) error
 }
 
 type TransactionRepository interface {
 	CreateTransaction(ctx context.Context, t *entity.Transaction) error
-	//GetTransactionByID(ctx context.Context, id uuid.UUID) (*entity.Transaction, error)
+	GetTransactionByID(ctx context.Context, id uuid.UUID) (*entity.Transaction, error)
 	TransactionListByMerchant(ctx context.Context, merchantID uuid.UUID) ([]entity.Transaction, error)
-	//GetAllTransaction(ctx context.Context) ([]entity.Transaction, error)
+	GetAllTransaction(ctx context.Context) ([]entity.Transaction, error)
 }
 
 type LogRepository interface {
 	CreateLog(ctx context.Context, l *entity.Log) error
-	//GetLogByID(ctx context.Context, logID string) (entity.Log, error)
+	GetLogByID(ctx context.Context, logID string) (entity.Log, error)
 	GetLogByResource(ctx context.Context, resourceID string) ([]entity.Log, error)
-	//GetAll(ctx context.Context) ([]entity.Log, error)
+	GetAll(ctx context.Context) ([]entity.Log, error)
 }
 
 // Input Ports

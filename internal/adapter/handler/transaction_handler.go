@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	_ "github.com/CardenalDex/crudprotec/internal/entitys"
 	"github.com/CardenalDex/crudprotec/internal/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

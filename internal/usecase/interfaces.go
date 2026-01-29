@@ -35,13 +35,32 @@ type LogRepository interface {
 	GetAll(ctx context.Context) ([]entity.Log, error)
 }
 
-// Input Ports
-
+// TransactionUseCase handles the core business logic for money movement
 type TransactionUseCase interface {
 	ProcessTransaction(ctx context.Context, merchantID uuid.UUID, amount int64) (*entity.Transaction, error)
+	GetTransaction(ctx context.Context, id uuid.UUID) (*entity.Transaction, error)
+	GetMerchantTransactions(ctx context.Context, merchantID uuid.UUID) ([]entity.Transaction, error)
+	GetAllTransactions(ctx context.Context) ([]entity.Transaction, error)
 }
 
+// MerchantUseCase handles merchant lifecycle
+type MerchantUseCase interface {
+	RegisterMerchant(ctx context.Context, businessID uuid.UUID) (*entity.Merchant, error)
+	GetMerchant(ctx context.Context, id uuid.UUID) (*entity.Merchant, error)
+	GetBusinessMerchants(ctx context.Context, businessID uuid.UUID) ([]entity.Merchant, error)
+	RemoveMerchant(ctx context.Context, id uuid.UUID) error // Logic delete
+}
+
+// AdminUseCase handles high-level configuration and auditing
 type AdminUseCase interface {
+	// Business Management
 	RegisterBusiness(ctx context.Context, commission int64) (*entity.Business, error)
+	GetBusiness(ctx context.Context, id uuid.UUID) (*entity.Business, error)
+	UpdateBusinessCommission(ctx context.Context, id uuid.UUID, newCommission int64) (*entity.Business, error)
+	RemoveBusiness(ctx context.Context, id uuid.UUID) error // Logic delete
+
+	// Auditing
 	GetAuditTrail(ctx context.Context, resourceID string) ([]entity.Log, error)
+	GetLogDetails(ctx context.Context, logID string) (entity.Log, error)
+	GetAllLogs(ctx context.Context) ([]entity.Log, error)
 }

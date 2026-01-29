@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	entity "github.com/CardenalDex/crudprotec/internal/entitys"
@@ -66,4 +67,28 @@ func (s *transactionService) ProcessTransaction(ctx context.Context, mID uuid.UU
 	})
 
 	return tx, nil
+}
+
+// GetTransaction retrieves a single transaction by its UUID
+func (s *transactionService) GetTransaction(ctx context.Context, id uuid.UUID) (*entity.Transaction, error) {
+	tx, err := s.repo.GetTransactionByID(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("transaction not found: %w", err)
+	}
+	return tx, nil
+}
+
+// GetMerchantTransactions retrieves all transactions associated with a specific merchant
+func (s *transactionService) GetMerchantTransactions(ctx context.Context, merchantID uuid.UUID) ([]entity.Transaction, error) {
+	// Optional: Validate merchant existence first if strict referential integrity is needed
+	if _, err := s.merchantRepo.GetMerchantByID(ctx, merchantID); err != nil {
+		return nil, errors.New("merchant not found")
+	}
+
+	return s.repo.TransactionListByMerchant(ctx, merchantID)
+}
+
+// GetAllTransactions retrieves every transaction in the database
+func (s *transactionService) GetAllTransactions(ctx context.Context) ([]entity.Transaction, error) {
+	return s.repo.GetAllTransaction(ctx)
 }

@@ -117,3 +117,13 @@ func toLogModel(e *entity.Log) *LogModel {
 		Timestamp:      e.Timestamp,
 	}
 }
+func (m *LogModel) toEntity() *entity.Log {
+	return &entity.Log{
+		ID:             m.ID,
+		Action:         m.Action,
+		Actor:          m.Actor,
+		ResourceID:     m.ResourceID,
+		PrevResourceID: m.PrevResourceID,
+		Timestamp:      m.Timestamp,
+	}
+}

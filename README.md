@@ -75,7 +75,7 @@ Unlike standard application logs that just print to the console, our **Logs** ar
 * **Where:** Stored in the `logs` table inside the SQLite database.
 * **What:** We capture the `Action`, the `ResourceID` (UUID of the affected entity), and a timestamp.
 * **Why:** This provides a history of system changes. If a business commission is updated, you'll see exactly when and which ID was affected.
-Since we dont have an auth, all actors are admin ...
+
 
 **Retrieve logs via:** `GET /api/v1/audit` or `GET /api/v1/audit/{resource_id}`.
 But is **EASIER** to do all directly from swagger

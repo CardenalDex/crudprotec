@@ -127,3 +127,46 @@ func (h *TransactionHandler) GetAllTransactions(c *gin.Context) {
 
 	c.JSON(http.StatusOK, transactions)
 }
+
+// @Summary Get all revenue
+// @Description Retrieve the total revenue of the system
+// @Tags transactions
+// @Produce json
+// @Success 200 {number} number "Example: 1.25"
+// @Failure 500 {object} map[string]string "Internal Server Error"
+// @Router /transactions/revenue [get]
+func (h *TransactionHandler) GetAllRevenue(c *gin.Context) {
+	transactions, err := h.service.GetAllRevenue(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, transactions)
+}
+
+// @Summary Get revenue by Merchant
+// @Description Retrieve all revenue of a merchant
+// @Tags transactions
+// @Produce json
+// @Param merchantID path string true "Merchant UUID"
+// @Success 200 {number} number "Example: 1.25"
+// @Failure 400 {object} map[string]string "Invalid UUID format"
+// @Failure 500 {object} map[string]string "Internal Server Error"
+// @Router /transactions/revenuebymerchant/{merchantID} [get]
+func (h *TransactionHandler) GetAllRevenueByMerchant(c *gin.Context) {
+	mParam := c.Param("merchantID")
+	mID, err := uuid.Parse(mParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Merchant UUID format"})
+		return
+	}
+
+	transactions, err := h.service.GetAllRevenueByMerchant(c.Request.Context(), mID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, transactions)
+}

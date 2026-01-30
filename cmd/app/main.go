@@ -54,6 +54,9 @@ func main() {
 		v1trans.GET("/:id", txHandler.GetTransaction)
 		v1trans.GET("/bymerchant/:merchantID", txHandler.GetMerchantTransactions)
 		v1trans.GET("/transactions", txHandler.GetAllTransactions)
+
+		v1trans.GET("/revenue", txHandler.GetAllRevenue)
+		v1trans.GET("/revenuebymerchant/:merchantID", txHandler.GetAllRevenueByMerchant)
 	}
 
 	admin := v1.Group("/admin")
@@ -68,6 +71,7 @@ func main() {
 	{
 		audit.GET("/", adminHandler.GetAllLogs)
 		audit.GET("/:resource_id", adminHandler.GetAuditTrail)
+
 	}
 	merchants := v1.Group("/merchants")
 	{

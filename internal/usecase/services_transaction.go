@@ -81,3 +81,28 @@ func (s *transactionService) GetMerchantTransactions(ctx context.Context, mercha
 func (s *transactionService) GetAllTransactions(ctx context.Context) ([]entity.Transaction, error) {
 	return s.repo.GetAllTransaction(ctx)
 }
+func (s *transactionService) GetAllRevenue(ctx context.Context) (float64, error) {
+	tx, err := s.repo.GetAllTransaction(ctx)
+	if err != nil {
+		return 0, errors.New("unk error")
+	}
+	total := 0.0
+	for _, t := range tx {
+		total += float64(t.Fee)
+	}
+
+	return total / 100, nil
+}
+
+func (s *transactionService) GetAllRevenueByMerchant(ctx context.Context, merchantID uuid.UUID) (float64, error) {
+	tx, err := s.repo.TransactionListByMerchant(ctx, merchantID)
+	if err != nil {
+		return 0, errors.New("unk error")
+	}
+	total := 0.0
+	for _, t := range tx {
+		total += float64(t.Fee)
+	}
+
+	return total / 100, nil
+}

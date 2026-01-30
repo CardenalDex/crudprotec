@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// ///////////////////db
 type BusinessRepository interface {
 	CreateBusiness(ctx context.Context, b *entity.Business) error
 	GetBusinessByID(ctx context.Context, id uuid.UUID) (*entity.Business, error)
@@ -35,12 +36,15 @@ type LogRepository interface {
 	GetAll(ctx context.Context) ([]entity.Log, error)
 }
 
-// /////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////gin tonic
 type TransactionUseCase interface {
 	ProcessTransaction(ctx context.Context, actor string, merchantID uuid.UUID, amount int64) (*entity.Transaction, error)
 	GetTransaction(ctx context.Context, id uuid.UUID) (*entity.Transaction, error)
 	GetMerchantTransactions(ctx context.Context, merchantID uuid.UUID) ([]entity.Transaction, error)
 	GetAllTransactions(ctx context.Context) ([]entity.Transaction, error)
+	//revenue
+	GetAllRevenue(ctx context.Context) (float64, error)
+	GetAllRevenueByMerchant(ctx context.Context, merchantID uuid.UUID) (float64, error)
 }
 
 type MerchantUseCase interface {

@@ -50,10 +50,10 @@ func (s *transactionService) ProcessTransaction(ctx context.Context, mID uuid.UU
 		return nil, err
 	}
 
-	_ = s.logRepo.CreateLog(ctx, &entity.Log{
+	s.logRepo.CreateLog(ctx, &entity.Log{
 		ID:         uuid.New(),
 		Action:     "TRANSACTION_CREATED",
-		Actor:      "system",
+		Actor:      "admin",
 		ResourceID: tx.ID.String(),
 		Timestamp:  time.Now(),
 	})

@@ -42,7 +42,7 @@ func (s *merchantService) RegisterMerchant(ctx context.Context, businessID uuid.
 		return nil, err
 	}
 
-	_ = s.logRepo.CreateLog(ctx, &entity.Log{
+	s.logRepo.CreateLog(ctx, &entity.Log{
 		ID:         uuid.New(),
 		Action:     "MERCHANT_REGISTERED",
 		Actor:      "admin",
@@ -73,7 +73,7 @@ func (s *merchantService) RemoveMerchant(ctx context.Context, id uuid.UUID) erro
 	}
 
 	// Audit Log
-	_ = s.logRepo.CreateLog(ctx, &entity.Log{
+	s.logRepo.CreateLog(ctx, &entity.Log{
 		ID:         uuid.New(),
 		Action:     "MERCHANT_DELETED",
 		Actor:      "admin",

@@ -41,7 +41,7 @@ func main() {
 	merchantHandler := handler.NewMerchantHandler(merchantService)
 
 	r := gin.Default()
-	r.Use(config.RequestLoggerMiddleware())
+	//r.Use(config.RequestLoggerMiddleware())
 
 	// Swagger Route
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

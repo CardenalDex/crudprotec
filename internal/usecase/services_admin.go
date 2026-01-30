@@ -29,6 +29,14 @@ func (s *adminService) RegisterBusiness(ctx context.Context, commission int64) (
 	if err := s.bizRepo.CreateBusiness(ctx, biz); err != nil {
 		return nil, err
 	}
+	s.logRepo.CreateLog(ctx, &entity.Log{
+		ID:             uuid.New(),
+		Action:         "CREATE_BUSINESS",
+		Actor:          "admin",
+		ResourceID:     biz.ID.String(),
+		PrevResourceID: "",
+		Timestamp:      time.Now(),
+	})
 
 	return biz, nil
 }
@@ -56,7 +64,7 @@ func (s *adminService) UpdateBusinessCommission(ctx context.Context, id uuid.UUI
 		return nil, err
 	}
 
-	_ = s.logRepo.CreateLog(ctx, &entity.Log{
+	s.logRepo.CreateLog(ctx, &entity.Log{
 		ID:             uuid.New(),
 		Action:         "UPDATE_BUSINESS_COMMISSION",
 		Actor:          "admin",

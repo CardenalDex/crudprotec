@@ -66,18 +66,16 @@ Why? in your *Definiciones de estructura sugeridas* logs use an UID, so I thnike
 
 ---
 
-## 🕵️ The Audit Trail (Logs)
+## 🕵️ The Audit Trail (Logs/Bitacora)
 
-In this system, logs aren't just for debugging; they are a first-class citizen of the business logic.
 
-### How it works
-
-Unlike standard application logs that just print to the console, our **Audit Logs** are triggered inside the **UseCase (Service) layer**.
+Unlike standard application logs that just print to the console, our **Logs** are triggered inside the **UseCase (Service) layer**.
 
 * **When:** Every time a `Create`, `Update`, or `Delete` method is called.
 * **Where:** Stored in the `logs` table inside the SQLite database.
 * **What:** We capture the `Action`, the `ResourceID` (UUID of the affected entity), and a timestamp.
-* **Why:** This provides a non-repudiable history of system changes. If a business commission is updated, you'll see exactly when and which ID was affected.
+* **Why:** This provides a history of system changes. If a business commission is updated, you'll see exactly when and which ID was affected.
+Since we dont have an auth, all actors are admin ...
 
 **Retrieve logs via:** `GET /api/v1/audit` or `GET /api/v1/audit/{resource_id}`.
 But is **EASIER** to do all directly from swagger
@@ -110,4 +108,4 @@ curl -X 'POST' \
 
 ---
 
-This is my first time writing a readme, and i always wanted to make it pretty like those real projects
+This is my first time writing a readme, and i always wanted to make it pretty like those real projects, so i got and copy a couple of templates

@@ -32,6 +32,7 @@ type updateCommissionRequest struct {
 // @Tags admin
 // @Accept json
 // @Produce json
+// @Param actor header string false "The name of the user performing the action"
 // @Param business body createBusinessRequest true "Business Registration"
 // @Success 201 {object} entity.Business
 // @Failure 400 {object} map[string]string "Invalid input"
@@ -43,11 +44,11 @@ func (h *AdminHandler) RegisterBusiness(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	actor := c.GetHeader("actor")
 	// Convert Percentage (5.5) -> Basis Points (550)
 	commissionBP := int64(req.Commission * 100)
 
-	biz, err := h.service.RegisterBusiness(c.Request.Context(), commissionBP)
+	biz, err := h.service.RegisterBusiness(c.Request.Context(), actor, commissionBP)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -87,6 +88,7 @@ func (h *AdminHandler) GetBusiness(c *gin.Context) {
 // @Tags admin
 // @Accept json
 // @Produce json
+// @Param actor header string false "The name of the user performing the action"
 // @Param id path string true "Business UUID"
 // @Param commission body updateCommissionRequest true "New Commission Rate"
 // @Success 200 {object} entity.Business
@@ -100,7 +102,7 @@ func (h *AdminHandler) UpdateBusinessCommission(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID format"})
 		return
 	}
-
+	actor := c.GetHeader("actor")
 	var req updateCommissionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -110,7 +112,7 @@ func (h *AdminHandler) UpdateBusinessCommission(c *gin.Context) {
 	// Convert Percentage -> Basis Points
 	commissionBP := int64(req.Commission * 100)
 
-	biz, err := h.service.UpdateBusinessCommission(c.Request.Context(), id, commissionBP)
+	biz, err := h.service.UpdateBusinessCommission(c.Request.Context(), actor, id, commissionBP)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -123,6 +125,7 @@ func (h *AdminHandler) UpdateBusinessCommission(c *gin.Context) {
 // @Description Soft delete a business (Logical Delete)
 // @Tags admin
 // @Produce json
+// @Param actor header string false "The name of the user performing the action"
 // @Param id path string true "Business UUID"
 // @Success 200 {object} map[string]string "Success message"
 // @Failure 400 {object} map[string]string "Invalid UUID"
@@ -135,8 +138,8 @@ func (h *AdminHandler) RemoveBusiness(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID format"})
 		return
 	}
-
-	if err := h.service.RemoveBusiness(c.Request.Context(), id); err != nil {
+	actor := c.GetHeader("actor")
+	if err := h.service.RemoveBusiness(c.Request.Context(), actor, id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

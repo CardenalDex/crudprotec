@@ -35,25 +35,26 @@ type LogRepository interface {
 	GetAll(ctx context.Context) ([]entity.Log, error)
 }
 
+// /////////////////////////////////////////////////////
 type TransactionUseCase interface {
-	ProcessTransaction(ctx context.Context, merchantID uuid.UUID, amount int64) (*entity.Transaction, error)
+	ProcessTransaction(ctx context.Context, actor string, merchantID uuid.UUID, amount int64) (*entity.Transaction, error)
 	GetTransaction(ctx context.Context, id uuid.UUID) (*entity.Transaction, error)
 	GetMerchantTransactions(ctx context.Context, merchantID uuid.UUID) ([]entity.Transaction, error)
 	GetAllTransactions(ctx context.Context) ([]entity.Transaction, error)
 }
 
 type MerchantUseCase interface {
-	RegisterMerchant(ctx context.Context, businessID uuid.UUID) (*entity.Merchant, error)
+	RegisterMerchant(ctx context.Context, actor string, businessID uuid.UUID) (*entity.Merchant, error)
 	GetMerchant(ctx context.Context, id uuid.UUID) (*entity.Merchant, error)
 	GetBusinessMerchants(ctx context.Context, businessID uuid.UUID) ([]entity.Merchant, error)
-	RemoveMerchant(ctx context.Context, id uuid.UUID) error
+	RemoveMerchant(ctx context.Context, actor string, id uuid.UUID) error
 }
 
 type AdminUseCase interface {
-	RegisterBusiness(ctx context.Context, commission int64) (*entity.Business, error)
+	RegisterBusiness(ctx context.Context, actor string, commission int64) (*entity.Business, error)
 	GetBusiness(ctx context.Context, id uuid.UUID) (*entity.Business, error)
-	UpdateBusinessCommission(ctx context.Context, id uuid.UUID, newCommission int64) (*entity.Business, error)
-	RemoveBusiness(ctx context.Context, id uuid.UUID) error
+	UpdateBusinessCommission(ctx context.Context, actor string, id uuid.UUID, newCommission int64) (*entity.Business, error)
+	RemoveBusiness(ctx context.Context, actor string, id uuid.UUID) error
 
 	// Auditing
 	GetAuditTrail(ctx context.Context, resourceID string) ([]entity.Log, error)

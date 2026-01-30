@@ -28,6 +28,7 @@ type createTransactionRequest struct {
 // @Tags transactions
 // @Accept json
 // @Produce json
+// @Param actor header string false "The name of the user performing the action"
 // @Param transaction body createTransactionRequest true "Transaction Request"
 // @Success 201 {object} entity.Transaction
 // @Failure 400 {object} map[string]string "Invalid input"
@@ -39,7 +40,7 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	actor := c.GetHeader("actor")
 	merchantUUID, err := uuid.Parse(req.MerchantID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Merchant UUID"})
@@ -49,7 +50,7 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	// CONVERSION LAYER: Convert User Float ($200.00) -> System Int64 Cents (20000)
 	amountCents := int64(req.Amount * 100)
 
-	tx, err := h.service.ProcessTransaction(c.Request.Context(), merchantUUID, amountCents)
+	tx, err := h.service.ProcessTransaction(c.Request.Context(), actor, merchantUUID, amountCents)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

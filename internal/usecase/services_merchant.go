@@ -23,7 +23,7 @@ func NewMerchantService(r MerchantRepository, b BusinessRepository, l LogReposit
 	}
 }
 
-func (s *merchantService) RegisterMerchant(ctx context.Context, businessID uuid.UUID) (*entity.Merchant, error) {
+func (s *merchantService) RegisterMerchant(ctx context.Context, actor string, businessID uuid.UUID) (*entity.Merchant, error) {
 	// 1. Validate Business existence
 	_, err := s.bizRepo.GetBusinessByID(ctx, businessID)
 	if err != nil {
@@ -45,7 +45,7 @@ func (s *merchantService) RegisterMerchant(ctx context.Context, businessID uuid.
 	s.logRepo.CreateLog(ctx, &entity.Log{
 		ID:         uuid.New(),
 		Action:     "MERCHANT_REGISTERED",
-		Actor:      "admin",
+		Actor:      actor,
 		ResourceID: m.ID.String(),
 		Timestamp:  now,
 	})
@@ -61,7 +61,7 @@ func (s *merchantService) GetBusinessMerchants(ctx context.Context, businessID u
 	return s.repo.GetMerchantByBusinessID(ctx, businessID)
 }
 
-func (s *merchantService) RemoveMerchant(ctx context.Context, id uuid.UUID) error {
+func (s *merchantService) RemoveMerchant(ctx context.Context, actor string, id uuid.UUID) error {
 	// Check if exists before deleting for better error handling
 	_, err := s.repo.GetMerchantByID(ctx, id)
 	if err != nil {
@@ -76,7 +76,7 @@ func (s *merchantService) RemoveMerchant(ctx context.Context, id uuid.UUID) erro
 	s.logRepo.CreateLog(ctx, &entity.Log{
 		ID:         uuid.New(),
 		Action:     "MERCHANT_DELETED",
-		Actor:      "admin",
+		Actor:      actor,
 		ResourceID: id.String(),
 		Timestamp:  time.Now(),
 	})

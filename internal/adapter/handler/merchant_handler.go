@@ -28,6 +28,7 @@ type createMerchantRequest struct {
 // @Tags merchants
 // @Accept json
 // @Produce json
+// @Param actor header string false "The name of the user performing the action"
 // @Param merchant body createMerchantRequest true "Merchant Registration"
 // @Success 201 {object} entity.Merchant
 // @Failure 400 {object} map[string]string "Invalid input or Business UUID"
@@ -39,14 +40,14 @@ func (h *MerchantHandler) RegisterMerchant(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	actor := c.GetHeader("actor")
 	bizUUID, err := uuid.Parse(req.BusinessID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Business UUID"})
 		return
 	}
 
-	merchant, err := h.service.RegisterMerchant(c.Request.Context(), bizUUID)
+	merchant, err := h.service.RegisterMerchant(c.Request.Context(), actor, bizUUID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -111,6 +112,7 @@ func (h *MerchantHandler) GetBusinessMerchants(c *gin.Context) {
 // @Description Logic delete of a merchant
 // @Tags merchants
 // @Produce json
+// @Param actor header string false "The name of the user performing the action"
 // @Param id path string true "Merchant UUID"
 // @Success 200 {object} map[string]string "Success message"
 // @Failure 400 {object} map[string]string "Invalid UUID"
@@ -123,8 +125,8 @@ func (h *MerchantHandler) RemoveMerchant(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID format"})
 		return
 	}
-
-	if err := h.service.RemoveMerchant(c.Request.Context(), id); err != nil {
+	actor := c.GetHeader("actor")
+	if err := h.service.RemoveMerchant(c.Request.Context(), actor, id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

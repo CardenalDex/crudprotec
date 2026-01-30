@@ -21,7 +21,7 @@ func NewTransactionService(tr TransactionRepository, mr MerchantRepository, br B
 	return &transactionService{tr, mr, br, lr}
 }
 
-func (s *transactionService) ProcessTransaction(ctx context.Context, mID uuid.UUID, amount int64) (*entity.Transaction, error) {
+func (s *transactionService) ProcessTransaction(ctx context.Context, actor string, mID uuid.UUID, amount int64) (*entity.Transaction, error) {
 
 	merchant, err := s.merchantRepo.GetMerchantByID(ctx, mID)
 	if err != nil {
@@ -53,7 +53,7 @@ func (s *transactionService) ProcessTransaction(ctx context.Context, mID uuid.UU
 	s.logRepo.CreateLog(ctx, &entity.Log{
 		ID:         uuid.New(),
 		Action:     "TRANSACTION_CREATED",
-		Actor:      "admin",
+		Actor:      actor,
 		ResourceID: tx.ID.String(),
 		Timestamp:  time.Now(),
 	})

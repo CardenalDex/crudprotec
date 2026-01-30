@@ -18,7 +18,7 @@ func NewAdminService(br BusinessRepository, lr LogRepository) AdminUseCase {
 	return &adminService{br, lr}
 }
 
-func (s *adminService) RegisterBusiness(ctx context.Context, commission int64) (*entity.Business, error) {
+func (s *adminService) RegisterBusiness(ctx context.Context, actor string, commission int64) (*entity.Business, error) {
 	biz := &entity.Business{
 		ID:         uuid.New(),
 		Commission: commission,
@@ -32,7 +32,7 @@ func (s *adminService) RegisterBusiness(ctx context.Context, commission int64) (
 	s.logRepo.CreateLog(ctx, &entity.Log{
 		ID:             uuid.New(),
 		Action:         "CREATE_BUSINESS",
-		Actor:          "admin",
+		Actor:          actor,
 		ResourceID:     biz.ID.String(),
 		PrevResourceID: "",
 		Timestamp:      time.Now(),
@@ -49,7 +49,7 @@ func (s *adminService) GetBusiness(ctx context.Context, id uuid.UUID) (*entity.B
 	return s.bizRepo.GetBusinessByID(ctx, id)
 }
 
-func (s *adminService) UpdateBusinessCommission(ctx context.Context, id uuid.UUID, newCommission int64) (*entity.Business, error) {
+func (s *adminService) UpdateBusinessCommission(ctx context.Context, actor string, id uuid.UUID, newCommission int64) (*entity.Business, error) {
 
 	biz, err := s.bizRepo.GetBusinessByID(ctx, id)
 	if err != nil {
@@ -67,7 +67,7 @@ func (s *adminService) UpdateBusinessCommission(ctx context.Context, id uuid.UUI
 	s.logRepo.CreateLog(ctx, &entity.Log{
 		ID:             uuid.New(),
 		Action:         "UPDATE_BUSINESS_COMMISSION",
-		Actor:          "admin",
+		Actor:          actor,
 		ResourceID:     id.String(),
 		PrevResourceID: fmt.Sprintf("old_comm:%d", oldCommission),
 		Timestamp:      time.Now(),
@@ -76,7 +76,7 @@ func (s *adminService) UpdateBusinessCommission(ctx context.Context, id uuid.UUI
 	return biz, nil
 }
 
-func (s *adminService) RemoveBusiness(ctx context.Context, id uuid.UUID) error {
+func (s *adminService) RemoveBusiness(ctx context.Context, actor string, id uuid.UUID) error {
 
 	if err := s.bizRepo.DeleteBusiness(ctx, id); err != nil {
 		return err
@@ -85,7 +85,7 @@ func (s *adminService) RemoveBusiness(ctx context.Context, id uuid.UUID) error {
 	_ = s.logRepo.CreateLog(ctx, &entity.Log{
 		ID:         uuid.New(),
 		Action:     "DELETE_BUSINESS",
-		Actor:      "admin",
+		Actor:      actor,
 		ResourceID: id.String(),
 		Timestamp:  time.Now(),
 	})
